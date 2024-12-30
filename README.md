@@ -17,7 +17,9 @@ The game board looks like this:
 ```
 
 o - Hit water
+
 x - Hit BattleShip
+
 . - Not yet hit
 
 Authors: Adam Majerík, Tomáš Karnet
