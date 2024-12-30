@@ -2,6 +2,7 @@
 This is an implementation of the game BattleShip for the class Princípy Operačných Systémov, for FRI UNIZA, year 2024/2025.
 
 The game board looks like this:
+```
    A B C D E F G G I J
  1 o o o o o o o o o o
  2 x o o o o o o o o o
@@ -13,6 +14,7 @@ The game board looks like this:
  8 x . o . o . o . . .
  9 . . . . . . . . . .
 10 . . . . . . . . . .
+```
 
 o - Hit water
 x - Hit BattleShip
