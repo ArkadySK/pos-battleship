@@ -5,7 +5,7 @@
 #define NOT_HIT '.'
 #define HIT_WATER 'o'
 #define HIT_SHIP 'X'
-#define SHIP '█'
+#define SHIP 'S'
 
 typedef struct board board;
 
