@@ -18,16 +18,16 @@ void board_init(board* b, int size)
 
 void board_display(board* b_own, board* b_enemy)
 {
-    printf("      Your board       |      Enemy board\n");
+    printf("       Your board      |      Enemy board\n");
     printf("   A B C D E F G H I J |   A B C D E F G H I J\n");
     for (int i = 0; i < b_own->size_; i++)
     {
-        printf("%2d ", i);
+        printf("%2d ", i + 1);
         for (int j = 0; j < b_own->size_; j++)
         {
             printf("%c ", b_own->board_[i][j]);
         }
-        printf("|%2d ", i);
+        printf("|%2d ", i + 1);
         for (int j = 0; j < b_enemy->size_; j++)
         {
             if (b_enemy->board_[i][j] = SHIP)
