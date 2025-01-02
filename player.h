@@ -1,10 +1,16 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#define NOT_HIT '.'
+#define HIT_WATER 'o'
+#define HIT_SHIP 'X'
+#define SHIP '█'
+
 typedef struct board board;
 
 struct board {
     char** board_;
+    int size_;
     int destroyed_;
 };
 
