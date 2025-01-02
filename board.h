@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #define NOT_HIT '.'
 #define HIT_WATER 'o'

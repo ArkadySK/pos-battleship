@@ -2,7 +2,7 @@
 
 void board_init(board* b, int size)
 {
-    b->board_ = malloc(size, sizeof(char*));
+    b->board_ = malloc(size * sizeof(char*));
     for (int i = 0; i < size; i++)
     {
         b->board_[i] = calloc(size, sizeof(char));
@@ -45,12 +45,11 @@ void board_display(board* b_own, board* b_enemy)
 
 void place_ships(board* b)
 {
-    board_display(b, true);
     printf("Where do you want to place the 5 tile ship?");
     // TODO: Waffle
 }
 
-void shoot(board* b)
+void shoot(board* b, int x, int y)
 {
     // TODO: Waffle
 }
