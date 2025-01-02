@@ -14,10 +14,10 @@ struct board {
     int destroyed_;
 };
 
-void board_init(board b, int size);
+void board_init(board* b, int size);
 
-void place_ships(board b);
+void place_ships(board* b);
 
-void board_display(board b, bool own);
+void board_display(board* b_own, board* b_enemy);
 
-int shoot(board b, int x, int y);
+int shoot(board* b, int x, int y);
