@@ -49,7 +49,7 @@ void place_ships(board* b)
     // TODO: Waffle
 }
 
-void shoot(board* b, int x, int y)
+int shoot(board* b, int x, int y)
 {
     // TODO: Waffle
 }
