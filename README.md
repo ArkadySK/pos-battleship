@@ -1,4 +1,7 @@
-# pos-battleship
+# POS Battleship
+Authors: Adam Majerík, Tomáš Karnet
+
+## Information
 This is an implementation of the game BattleShip for the class Princípy Operačných Systémov, for FRI UNIZA, year 2024/2025.
 
 The game board is displayed in the following way for each player:
@@ -22,4 +25,18 @@ x - Hit BattleShip
 
 . - Not yet hit
 
-Authors: Adam Majerík, Tomáš Karnet
+
+
+### How to run the code? 
+
+1. Create a build folder
+```
+mkdir build
+cd build
+cmake ..
+```
+
+2. Launch a build process
+```
+cmake --build .
+```
