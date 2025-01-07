@@ -40,3 +40,13 @@ cmake ..
 ```
 cmake --build .
 ```
+
+3. Start the program 
+- client:
+```
+./bin/client
+```
+- server:
+```
+./bin/server
+```
