@@ -5,7 +5,7 @@
 #define NOT_HIT '.'
 #define HIT_WATER 'o'
 #define HIT_SHIP 'X'
-#define SHIP 'S'
+#define SHIP '#'
 
 typedef struct board board;
 
@@ -16,6 +16,8 @@ struct board {
 };
 
 void board_init(board* b, int size);
+
+void board_destroy(board* b);
 
 void place_ships(board* b);
 

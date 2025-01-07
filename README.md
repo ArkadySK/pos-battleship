@@ -6,17 +6,17 @@ The game board is displayed in the following way for each player:
    A B C D E F G G I J
  1 o o o o o o o o o o
  2 X o o o o o o o o o
- 3 █ . . . . . . . . .
+ 3 # . . . . . . . . .
  4 o o o o o o o o o o
  5 o o . . . . . . o o
  6 . . . X X X X o o o
  7 X . o . o . o o o .
- 8 X . o . o . o █ █ █
- 9 █ . . . . . . . . .
-10 . . . . . █ █ █ █ █
+ 8 X . o . o . o # # #
+ 9 # . . . . . . . . .
+10 . . . . . # # # # #
 ```
 
-█ - Players ship tile (alt + 219)
+\# - Players ship tile
 
 o - Hit water
 

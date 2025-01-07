@@ -16,6 +16,15 @@ void board_init(board* b, int size)
     b->destroyed_ = 0;
 }
 
+void board_destroy(board* b)
+{
+    for (int i = 0; i < b->size_; i++)
+    {
+        free(b->board_[i]);
+    }
+    free(b->board_);    
+}
+
 void board_display(board* b_own, board* b_enemy)
 {
     printf("       Your board      |      Enemy board\n");
