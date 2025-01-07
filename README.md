@@ -8,20 +8,22 @@ The game board is displayed in the following way for each player:
 ```
    A B C D E F G G I J
  1 o o o o o o o o o o
- 2 x o o o o o o o o o
- 3 . . . . . . . . . .
+ 2 X o o o o o o o o o
+ 3 # . . . . . . . . .
  4 o o o o o o o o o o
  5 o o . . . . . . o o
- 6 . . . x x x x o o o
- 7 x . o . o . o o o .
- 8 x . o . o . o . . .
- 9 . . . . . . . . . .
-10 . . . . . . . . . .
+ 6 . . . X X X X o o o
+ 7 X . o . o . o o o .
+ 8 X . o . o . o # # #
+ 9 # . . . . . . . . .
+10 . . . . . # # # # #
 ```
+
+\# - Players ship tile
 
 o - Hit water
 
-x - Hit BattleShip
+X - Hit BattleShip
 
 . - Not yet hit
 
