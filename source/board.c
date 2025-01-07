@@ -57,7 +57,10 @@ void place_ships(board* b)
     printf("Ship coordinates are given as: \"2Ad\" ");
     printf("where 2A are the coordinates of the ship, ");
     printf("and the last letter is either \"d\" or \"r\" for down or right\n");
-    printf("Where do you want to place the 5 tile ship?");
+    printf("Where do you want to place the 5 tile ship?\n");
+    char line[3];
+    fgets(line, sizeof(line), stdin);
+    
     // TODO: Waffle
 }
 
