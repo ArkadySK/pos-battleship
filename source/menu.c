@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "menu.h"
-#include "utils.h"
+#include "utils.c"
 
 char display_menu(void) {
     clear_screen();
