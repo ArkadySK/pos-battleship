@@ -43,3 +43,5 @@ bool receive_shot(int x, int y, board* b);
 void get_shot(char* shot, board* b_enemy);
 
 char* shoot(board* b_enemy);
+
+void mark_hit(char* shot, bool destroyed, board* b_enemy);

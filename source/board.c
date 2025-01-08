@@ -330,3 +330,15 @@ char* shoot(board* b_enemy)
     get_shot(shot, b_enemy);
     return shot;
 }
+// Adam, dont forget to save the last shot before you send it to server, youll need it for this
+void mark_hit(char* shot, bool destroyed, board* b_enemy)
+{
+    int x = shot[0] - 'A';
+    int y = shot[1] - '0';
+    if (destroyed)
+    {
+        b_enemy->board_[x][y] = HIT_SHIP;
+        return;
+    }
+    b_enemy->board_[x][y] = HIT_WATER;
+}
