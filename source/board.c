@@ -54,7 +54,7 @@ void board_display(board* b_own, board* b_enemy)
 
 bool validate_coords(char* coords)
 {
-    return((coords[0] >= '0') && (coords[0] <= '9') && (coords[1] >= 'A') && (coords[1] <= 'J'));
+    return((coords[0] >= 'A') && (coords[0] <= 'J') && (coords[1] >= '0') && (coords[1] <= '9'));
 }
 
 bool validate_rotation(char rotation)
@@ -71,7 +71,7 @@ bool validate_position(char* position, int size, board* b)
     if (down)
     {
         // Check if ship is out of bounds
-        if (y + size >= 10) return false;
+        if (y + size >= b->size_) return false;
 
         // Check if the tiles where the ship will be placed are occupied by another ship
         for (int i = y; i < y + size; i++)
@@ -87,7 +87,7 @@ bool validate_position(char* position, int size, board* b)
             }
         }
         // Check if there are taken tiles to the right of the ship, if any
-        if (x < 9)
+        if (x < b->size_ - 1)
         {
             for (int i = y; i < y + size; i++)
             {
@@ -100,7 +100,7 @@ bool validate_position(char* position, int size, board* b)
             && (b->board_[x + 1][y - 1] == SHIP))
             return false;
         // Check if there are taken tiles above and diagonally below the ship, if any
-        if ((y + size < 9) && (b->board_[x][y + size] == SHIP)
+        if ((y + size < b->size_ - 1) && (b->board_[x][y + size] == SHIP)
             && (b->board_[x - 1][y + size] == SHIP)
             && (b->board_[x + 1][y + size] == SHIP))
             return false;
@@ -108,7 +108,7 @@ bool validate_position(char* position, int size, board* b)
     else
     {
         // Check if ship is out of bounds
-        if (x + size >= 10) return false;
+        if (x + size >= b->size_) return false;
         // Check if the tiles where the ship will be placed are occupied by another ship
         for (int i = x; i < x + size; i++)
         {
@@ -120,7 +120,7 @@ bool validate_position(char* position, int size, board* b)
             && (b->board_[x - 1][y + 1] == SHIP))
             return false;
         // Check if there are taken tiles left and diagonally left of the ship, if any
-        if ((x + size < 10) && (b->board_[x + size][y] == SHIP)
+        if ((x + size < b->size_ - 1) && (b->board_[x + size][y] == SHIP)
             && (b->board_[x + size][y - 1] == SHIP)
             && (b->board_[x + size][y + 1] == SHIP))
             return false;
@@ -133,7 +133,7 @@ bool validate_position(char* position, int size, board* b)
             }
         }
         // Check if there are taken tiles below the ship, if any
-        if (y < 9)
+        if (y < b->size_ - 1)
         {
             for (int i = x; i < x + size; i++)
             {
