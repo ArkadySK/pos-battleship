@@ -36,4 +36,10 @@ void finalise_placement(char* position, int size, board* b);
 
 void place_ships(board* b);
 
-int shoot(board* b, int x, int y);
+bool check_destroyed(int x, int y, board* b);
+
+bool receive_shot(int x, int y, board* b);
+
+void get_shot(char* shot, board* b_enemy);
+
+char* shoot(board* b_enemy);
