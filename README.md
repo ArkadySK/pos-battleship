@@ -7,16 +7,16 @@ This is an implementation of the game BattleShip for the class Princípy Operač
 The game board is displayed in the following way for each player:
 ```
    A B C D E F G G I J
- 1 o o o o o o o o o o
- 2 X o o o o o o o o o
- 3 # . . . . . . . . .
- 4 o o o o o o o o o o
- 5 o o . . . . . . o o
- 6 . . . X X X X o o o
- 7 X . o . o . o o o .
- 8 X . o . o . o # # #
- 9 # . . . . . . . . .
-10 . . . . . # # # # #
+ 0 o o o o o o o o o o
+ 1 X o o o o o o o o o
+ 2 # . . . . . . . . .
+ 3 o o o o o o o o o o
+ 4 o o . . . . . . o o
+ 5 . . . X X X X o o o
+ 6 X . o . o . o o o .
+ 7 X . o . o . o # # #
+ 8 # . . . . . . . . .
+ 9 . . . . . # # # # #
 ```
 
 \# - Players ship tile

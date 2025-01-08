@@ -31,12 +31,12 @@ void board_display(board* b_own, board* b_enemy)
     printf("   A B C D E F G H I J |   A B C D E F G H I J\n");
     for (int i = 0; i < b_own->size_; i++)
     {
-        printf("%2d ", i + 1);
+        printf("%2d ", i);
         for (int j = 0; j < b_own->size_; j++)
         {
             printf("%c ", b_own->board_[i][j]);
         }
-        printf("|%2d ", i + 1);
+        printf("|%2d ", i);
         for (int j = 0; j < b_enemy->size_; j++)
         {
             if (b_enemy->board_[i][j] = SHIP)
@@ -52,13 +52,106 @@ void board_display(board* b_own, board* b_enemy)
     }
 }
 
+bool validate_coords(char* coords)
+{
+    return((coords[0] >= '0') && (coords[0] <= '9') && (coords[1] >= 'A') && (coords[1] <= 'J'));
+}
+
+bool validate_rotation(char rotation)
+{
+    return((rotation == DOWN) || (rotation == RIGHT));
+}
+
+bool validate_position(char* position, int size, board* b)
+{
+    int x = position[0] - 'A';
+    int y = position[1] - '0';
+    bool down = true;
+    if (position[2] == 'r') down = false;
+    if (down)
+    {
+        if (y + size >= 10) return false;
+        for (int i = y; i < y + size; i++)
+        {
+            if (b->board_[x][i] == SHIP) return false;
+        }
+
+        if (x > 0)
+        {
+            for (int i = y; i < y + size; i++)
+            {
+                if (b->board_[x - 1][i] == SHIP) return false;
+            }
+        }
+
+        if (x + size < 9)
+        {
+            for (int i = y; i < y + size; i++)
+            {
+                if (b->board_[x + 1][i] == SHIP) return false;
+            }
+        }
+
+        if ((y > 0) && (b->board_[x][y - 1] == SHIP)
+            && (b->board_[x - 1][y - 1] == SHIP)
+            && (b->board_[x + 1][y - 1] == SHIP))
+            return false;
+        
+        if ((y + size < 9) && (b->board_[x][y + size] == SHIP)
+            && (b->board_[x - 1][y + size] == SHIP)
+            && (b->board_[x + 1][y + size] == SHIP))
+            return false;
+    }
+    else
+    {
+        if (x + size >= 10) return false;
+        for (int i = x; i < x + size; i++)
+        {
+            if (b->board_[i][y] == SHIP) return false;
+        }
+
+        if ((x > 0) && (b->board_[x - 1][y] == SHIP)
+            && (b->board_[x - 1][y - 1] == SHIP)
+            && (b->board_[x - 1][y + 1] == SHIP))
+            return false;
+        
+        if ((x + size < 10) && (b->board_[x + size][y] == SHIP)
+            && (b->board_[x + size][y - 1] == SHIP)
+            && (b->board_[x + size][y + 1] == SHIP))
+            return false;
+    }
+    
+}
+
 void place_ships(board* b)
 {
-    printf("Ship coordinates are given as: \"2Ad\" ");
-    printf("where 2A are the coordinates of the ship, ");
-    printf("and the last letter is either \"d\" or \"r\" for down or right\n");
+    printf("Ship coordinates are given as: \"A2d\" ");
+    printf("X coordinate: A-J\n");
+    printf("Y coordinate: 0-9\n");
+    printf("Rotation: d = down, r = right");
     printf("Where do you want to place the 5 tile ship?\n");
-    char line[3];
+    char line[4];
+    bool accepted = false;
+    while (!accepted)
+    {
+        int c;
+        while ((c = getchar() != '\n') && c != EOF);
+        if (fgets(line, sizeof(line), stdin) == NULL) {
+            printf("An error occured, try again\n");
+            continue;
+        }
+        if (strrchr(line, '\n')) {
+            printf("Not enough characters to place ship, try again\n");
+            continue;
+        }
+        if ()
+        {
+            /* code */
+        }
+        
+        
+    }
+    
     fgets(line, sizeof(line), stdin);
     
     // TODO: Waffle
