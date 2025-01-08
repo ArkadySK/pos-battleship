@@ -70,12 +70,15 @@ bool validate_position(char* position, int size, board* b)
     if (position[2] == 'r') down = false;
     if (down)
     {
+        // Check if ship is out of bounds
         if (y + size >= 10) return false;
+
+        // Check if the tiles where the ship will be placed are occupied by another ship
         for (int i = y; i < y + size; i++)
         {
             if (b->board_[x][i] == SHIP) return false;
         }
-
+        // Check if there are taken tiles to the left of the ship, if any
         if (x > 0)
         {
             for (int i = y; i < y + size; i++)
@@ -83,20 +86,20 @@ bool validate_position(char* position, int size, board* b)
                 if (b->board_[x - 1][i] == SHIP) return false;
             }
         }
-
-        if (x + size < 9)
+        // Check if there are taken tiles to the right of the ship, if any
+        if (x < 9)
         {
             for (int i = y; i < y + size; i++)
             {
                 if (b->board_[x + 1][i] == SHIP) return false;
             }
         }
-
+        // Check if there are taken tiles above and diagonally above the ship, if any
         if ((y > 0) && (b->board_[x][y - 1] == SHIP)
             && (b->board_[x - 1][y - 1] == SHIP)
             && (b->board_[x + 1][y - 1] == SHIP))
             return false;
-        
+        // Check if there are taken tiles above and diagonally below the ship, if any
         if ((y + size < 9) && (b->board_[x][y + size] == SHIP)
             && (b->board_[x - 1][y + size] == SHIP)
             && (b->board_[x + 1][y + size] == SHIP))
@@ -104,23 +107,94 @@ bool validate_position(char* position, int size, board* b)
     }
     else
     {
+        // Check if ship is out of bounds
         if (x + size >= 10) return false;
+        // Check if the tiles where the ship will be placed are occupied by another ship
         for (int i = x; i < x + size; i++)
         {
             if (b->board_[i][y] == SHIP) return false;
         }
-
+        // Check if there are taken tiles right and diagonally right of the ship, if any
         if ((x > 0) && (b->board_[x - 1][y] == SHIP)
             && (b->board_[x - 1][y - 1] == SHIP)
             && (b->board_[x - 1][y + 1] == SHIP))
             return false;
-        
+        // Check if there are taken tiles left and diagonally left of the ship, if any
         if ((x + size < 10) && (b->board_[x + size][y] == SHIP)
             && (b->board_[x + size][y - 1] == SHIP)
             && (b->board_[x + size][y + 1] == SHIP))
             return false;
+        // Check if there are taken tiles above the ship, if any
+        if (y > 0)
+        {
+            for (int i = x; i < x + size; i++)
+            {
+                if (b->board_[i][y = 1] == SHIP) return false;
+            }
+        }
+        // Check if there are taken tiles below the ship, if any
+        if (y < 9)
+        {
+            for (int i = x; i < x + size; i++)
+            {
+                if (b->board_[i][y + 1] == SHIP) return false;
+            }
+        }
     }
-    
+    return true;
+}
+
+void get_ship(char* position, int size, board* b)
+{
+    bool accepted = false;
+    while (!accepted)
+    {
+        int c;
+        while ((c = getchar() != '\n') && c != EOF);
+        if (fgets(position, sizeof(char) * 4, stdin) == NULL)
+        {
+            printf("An error occured, try again\n");
+            continue;
+        }
+        if (strrchr(position, '\n'))
+        {
+            printf("Not enough characters to place ship, try again\n");
+            continue;
+        }
+        if (!(validate_coords(position) && validate_rotation(position[2])))
+        {
+            printf("Input not valid, try again\n");
+            continue;
+        }
+        if (!validate_position(position, size, b))
+        {
+            printf("Ship out of bounds, or conflicting with other ships, try again\n");
+            continue;
+        }        
+    }
+    printf("Placement accepted!");
+}
+
+void finalise_placement(char* position, int size, board* b)
+{
+    int x = position[0] - 'A';
+    int y = position[1] - '0';
+    bool down = true;
+    if (position[2] == 'r') down = false;
+    if (down)
+    {
+        for (int i = y; i < y + size ; i++)
+        {
+            b->board_[x][i] = SHIP;
+        }
+    }
+    else
+    {
+       for (int i = x; i < x + size ; i++)
+        {
+            b->board_[i][y] = SHIP;
+        } 
+    }
 }
 
 void place_ships(board* b)
@@ -129,32 +203,30 @@ void place_ships(board* b)
     printf("X coordinate: A-J\n");
     printf("Y coordinate: 0-9\n");
     printf("Rotation: d = down, r = right");
+    printf("Ships cannot be adjacent to other ships\n");
+    board_display(b, b);
+    char position[4];
     printf("Where do you want to place the 5 tile ship?\n");
-    char line[4];
-    bool accepted = false;
-    while (!accepted)
-    {
-        int c;
-        while ((c = getchar() != '\n') && c != EOF);
-        if (fgets(line, sizeof(line), stdin) == NULL) {
-            printf("An error occured, try again\n");
-            continue;
-        }
-        if (strrchr(line, '\n')) {
-            printf("Not enough characters to place ship, try again\n");
-            continue;
-        }
-        if ()
-        {
-            /* code */
-        }
-        
-        
-    }
-    
-    fgets(line, sizeof(line), stdin);
-    
-    // TODO: Waffle
+    get_ship(position, 5, b);
+    finalise_placement(position, 5, b);
+    board_display(b, b);
+    printf("Where do you want to place the 4 tile ship?\n");
+    get_ship(position, 4, b);
+    finalise_placement(position, 4, b);
+    board_display(b, b);
+    printf("Where do you want to place the first 3 tile ship?\n");
+    get_ship(position, 3, b);
+    finalise_placement(position, 3, b);
+    board_display(b, b);
+    printf("Where do you want to place the second 3 tile ship?\n");
+    get_ship(position, 3, b);
+    finalise_placement(position, 3, b);
+    board_display(b, b);
+    printf("Where do you want to place the 2 tile ship?\n");
+    get_ship(position, 2, b);
+    finalise_placement(position, 2, b);
+    board_display(b, b);
+    printf("All ships successfully placed");
 }
 
 int shoot(board* b, int x, int y)
