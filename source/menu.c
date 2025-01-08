@@ -39,10 +39,7 @@ int handle_menu(void) {
                 return 2;
             case 'q':
             case 'Q':
-                return 0;        
-            default:
-                getchar();
-                break;
+                return 0;   
         }
     }
     return 0;
