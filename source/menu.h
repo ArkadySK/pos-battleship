@@ -1,2 +1,3 @@
-char display_menu(void);
-int handle_menu(void);
+char display_menu();
+int handle_menu();
+void show_message(char* message);

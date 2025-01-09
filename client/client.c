@@ -76,12 +76,13 @@ int main() {
     clear_screen();
     
     if (mode == 1) { // Computer game mode
-        printf("Computer mode not yet implemented\n");
+        show_message("Computer mode not yet implemented\n");
+        //TODO Waffle: implement
         return 0;
     }
     
     if (mode == 2) { // Human vs Human (network) mode
-        printf("Please wait, connecting to server...\n");
+        show_message("Please wait, connecting...\n");
         int sock = initialize_client();
         play_game(sock);
         close(sock);
