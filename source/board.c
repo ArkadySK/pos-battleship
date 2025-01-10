@@ -333,7 +333,7 @@ char* shoot(board* b_enemy)
     printf("X coordinate: A-J\n");
     printf("Y coordinate: 0-9\n");
     printf("Where do you want to shoot?\n");
-    char* shot[3];
+    char* shot = calloc(3, sizeof(char));
     get_shot(shot, b_enemy);
     return shot;
 }
@@ -350,9 +350,9 @@ void mark_hit(char* shot, bool destroyed, board* b_enemy)
     b_enemy->board_[x][y] = HIT_WATER;
 }
 
-int main() {
-    //TODO Adam: testing purposes
-    board b;
-    board_init(&b, 10);
-    place_ships(&b);
-}
+// int main() {
+//     //TODO Adam: testing purposes
+//     board b;
+//     board_init(&b, 10);
+//     place_ships(&b);
+// }
