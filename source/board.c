@@ -30,17 +30,17 @@ void board_display(board* b_own, board* b_enemy)
     clear_screen();
     printf("       Your board      |      Enemy board\n");
     printf("   A B C D E F G H I J |   A B C D E F G H I J\n");
-    for (int i = 0; i < b_own->size_; i++)
+    for (int j = 0; j < b_own->size_; j++)
     {
-        printf("%2d ", i);
-        for (int j = 0; j < b_own->size_; j++)
+        printf("%2d ", j);
+        for (int i = 0; i < b_own->size_; i++)
         {
             printf("%c ", b_own->board_[i][j]);
         }
-        printf("|%2d ", i);
-        for (int j = 0; j < b_enemy->size_; j++)
+        printf("|%2d ", j);
+        for (int i = 0; i < b_enemy->size_; i++)
         {
-            if (b_enemy->board_[i][j] = SHIP)
+            if (b_enemy->board_[i][j] == SHIP)
             {
                 printf("%c ", NOT_HIT);
             }
@@ -147,12 +147,11 @@ bool validate_position(char* position, int size, board* b)
 
 void get_ship(char* position, int size, board* b)
 {
-    bool accepted = false;
-    while (!accepted)
+    while (true)
     {
-        int c;
-        while ((c = getchar() != '\n') && c != EOF);
-        if (fgets(position, sizeof(char) * 3, stdin) == NULL)
+        char* result = fgets(position, 4 * sizeof(char), stdin);
+        while (getchar() != '\n');
+        if (result == NULL)
         {
             printf("An error occured, try again\n");
             continue;
@@ -171,7 +170,8 @@ void get_ship(char* position, int size, board* b)
         {
             printf("Ship out of bounds, or conflicting with other ships, try again\n");
             continue;
-        }        
+        }
+        break;
     }
     printf("Placement accepted!");
 }
@@ -200,13 +200,17 @@ void finalise_placement(char* position, int size, board* b)
 
 void place_ships(board* b)
 {
-    printf("Ship coordinates are given as: \"A2d\" ");
+    printf("-------------INFO--------------\n");
+    printf("Ship coordinates are given as: \"A2d\" \n");
     printf("X coordinate: A-J\n");
     printf("Y coordinate: 0-9\n");
-    printf("Rotation: d = down, r = right");
+    printf("Rotation: d = down, r = right\n");
     printf("Ships cannot be adjacent to other ships\n");
+    printf("-------------------------------\n");
+    printf("Press any key to continue...\n");
+    getchar();
     board_display(b, b);
-    char position[4];
+    char* position = calloc(4, sizeof(char));
     printf("Where do you want to place the 5 tile ship?\n");
     get_ship(position, 5, b);
     finalise_placement(position, 5, b);
@@ -228,6 +232,7 @@ void place_ships(board* b)
     finalise_placement(position, 2, b);
     board_display(b, b);
     printf("All ships successfully placed");
+    free(position);
 }
 
 bool check_destroyed(int x, int y, board* b)
@@ -269,6 +274,7 @@ bool check_destroyed(int x, int y, board* b)
     }
     return true;
 }
+
 // Output will probably be sent to server
 bool receive_shot(int x, int y, board* b)
 {
@@ -327,7 +333,7 @@ char* shoot(board* b_enemy)
     printf("X coordinate: A-J\n");
     printf("Y coordinate: 0-9\n");
     printf("Where do you want to shoot?\n");
-    char* shot[3];
+    char* shot = calloc(3, sizeof(char));
     get_shot(shot, b_enemy);
     return shot;
 }
@@ -343,3 +349,10 @@ void mark_hit(char* shot, bool destroyed, board* b_enemy)
     }
     b_enemy->board_[x][y] = HIT_WATER;
 }
+
+// int main() {
+//     //TODO Adam: testing purposes
+//     board b;
+//     board_init(&b, 10);
+//     place_ships(&b);
+// }

@@ -41,3 +41,10 @@ int handle_menu(void) {
     }
     return 0;
 }
+
+void show_message(char* message) {
+    clear_screen();
+    printf("  -------------------------------  \n  ");
+    printf(message);
+    printf("  -------------------------------  \n");
+}
