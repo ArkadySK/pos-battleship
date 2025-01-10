@@ -1,5 +1,4 @@
 #include "board.h"
-#include "utils.h"
 
 void board_init(board* b, int size)
 {

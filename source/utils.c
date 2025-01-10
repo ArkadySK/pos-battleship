@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include "utils.h"
 
 // Clears the screen using ANSI escape sequence
 void clear_screen() {

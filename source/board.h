@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include "utils.h"
 
 #define NOT_HIT '.'
 #define HIT_WATER 'o'
