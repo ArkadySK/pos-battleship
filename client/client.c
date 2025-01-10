@@ -3,12 +3,13 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <string.h>
 #include "../source/board.h"
 #include "../source/menu.h"
 #include "../source/utils.h"
 
-#define PORT 8080
+#define PORT 8536
 #define SERVER_IP "127.0.0.1" //localhost
 
 int initialize_client() {
@@ -47,9 +48,6 @@ void play_game(int sock) {
     board_init(&b_own, 10);
     board_init(&b_enemy, 10);
     
-    // Display initial board state
-    board_display(&b_own, &b_enemy);
-    
     // Place ships
     place_ships(&b_own);
     
@@ -57,7 +55,8 @@ void play_game(int sock) {
     bool requestGameEnd = false;
     while (!requestGameEnd) {
         // TODO Adam: Implement game loop with server communication
-
+        // Display initial board state
+        // board_display(&b_own, &b_enemy);
     }
     
     // Cleanup
@@ -77,12 +76,15 @@ int main() {
     
     if (mode == 1) { // Computer game mode
         show_message("Computer mode not yet implemented\n");
+        sleep(3);
+        clear_screen();
         //TODO Waffle: implement
         return 0;
     }
     
     if (mode == 2) { // Human vs Human (network) mode
         show_message("Please wait, connecting...\n");
+        sleep(1);
         int sock = initialize_client();
         play_game(sock);
         close(sock);

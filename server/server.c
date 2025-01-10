@@ -6,19 +6,22 @@
 #include <string.h>
 #include <pthread.h>
 #include <stdatomic.h>
+#include <stdbool.h>
 
-#define PORT 8080
+#define PORT 8536
 #define MAX_PLAYERS 2
 
 atomic_int player_count = 0; // Atomic variable to track connected players
 
-int initialize_server() {
+int initialize_server()
+{
     int server_fd;
     struct sockaddr_in address;
     int opt = 1;
 
     // Create socket
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+    {
         perror("IS: Socket failed");
         exit(EXIT_FAILURE);
     }
@@ -29,13 +32,15 @@ int initialize_server() {
     address.sin_port = htons(PORT);
 
     // Bind the socket to the address
-    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
+    {
         perror("IS: Bind failed");
         exit(EXIT_FAILURE);
     }
 
     // Start listening for connections
-    if (listen(server_fd, 3) < 0) {
+    if (listen(server_fd, 3) < 0)
+    {
         perror("IS: Listen failed");
         exit(EXIT_FAILURE);
     }
@@ -43,7 +48,8 @@ int initialize_server() {
     return server_fd;
 }
 
-void *handle_client(void *arg) {
+void *handle_client(void *arg)
+{
     int client_socket = *(int *)arg;
     free(arg); // Free memory allocated for client_socket
 
@@ -54,7 +60,8 @@ void *handle_client(void *arg) {
     printf("HC: Message from client: %s\n", buffer);
 
     // Send response to client
-    send(client_socket, "Hello from server", strlen("Hello from server"), 0);
+    const char* message = "Hello from server";
+    send(client_socket, message, strlen(message), 0);
     printf("HC: Message sent to client\n");
 
     // Decrement the player count atomically
@@ -64,19 +71,26 @@ void *handle_client(void *arg) {
     return NULL;
 }
 
-int main() {
+int main()
+{
     int server_fd = initialize_server();
 
     printf("Server is running on port %d\n", PORT);
 
-    while (1) {
-        printf("player_count: %d\n", player_count);
-        if (atomic_load(&player_count) < MAX_PLAYERS) {
+    while (true)
+    {
+        printf("player_count: %d\n", atomic_load(&player_count));
+        if (atomic_load(&player_count) < MAX_PLAYERS)
+        {
             struct sockaddr_in address;
             int addrlen = sizeof(address);
             int *new_socket = malloc(sizeof(int)); // Allocate memory for the socket
 
-            if ((*new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen)) < 0) {
+            int accepted_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
+            *new_socket = accepted_socket;
+
+            if (accepted_socket < 0)
+            {
                 perror("Server: Accept failed");
                 free(new_socket); // Free memory in case of failure
                 continue;
@@ -87,16 +101,21 @@ int main() {
 
             // Create a thread to handle the client
             pthread_t thread_id;
-            if (pthread_create(&thread_id, NULL, handle_client, new_socket) != 0) {
+            if (pthread_create(&thread_id, NULL, handle_client, new_socket) != 0)
+            {
                 perror("Server: Thread creation failed");
                 atomic_fetch_sub(&player_count, 1); // Decrement count if thread creation fails
                 close(*new_socket);
                 free(new_socket);
-            } else {
+            }
+            else
+            {
                 pthread_detach(thread_id); // Detach the thread to avoid memory leaks
             }
-        } else {
-            printf("Server: Maximum players connected. Connection rejected.\n");
+        }
+        else
+        {
+            //printf("Server: Maximum players connected. Connection rejected.\n");
             sleep(1); // Optional sleep to avoid busy waiting
         }
     }
