@@ -1,4 +1,5 @@
 #include "board.h"
+#include "utils.h"
 
 void board_init(board* b, int size)
 {
@@ -27,6 +28,7 @@ void board_destroy(board* b)
 
 void board_display(board* b_own, board* b_enemy)
 {
+    clear_screen();
     printf("       Your board      |      Enemy board\n");
     printf("   A B C D E F G H I J |   A B C D E F G H I J\n");
     for (int i = 0; i < b_own->size_; i++)
