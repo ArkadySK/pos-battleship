@@ -27,6 +27,7 @@ void board_destroy(board* b)
 
 void board_display(board* b_own, board* b_enemy)
 {
+    clear_screen();
     printf("       Your board      |      Enemy board\n");
     printf("   A B C D E F G H I J |   A B C D E F G H I J\n");
     for (int j = 0; j < b_own->size_; j++)
@@ -234,9 +235,119 @@ void place_ships(board* b)
     free(position);
 }
 
-int shoot(board* b, int x, int y)
+bool check_destroyed(int x, int y, board* b)
 {
-    // TODO: Waffle
+    int checking;
+    if (y > 0) {
+        checking = y - 1;
+        do
+        {
+            if (b->board_[x][checking] == SHIP) return false;
+            checking -= 1;
+        } while ((checking >= 0) && (b->board_[x][checking] == HIT_SHIP));
+    }
+    if (y < b->size_ - 1)
+    {
+        checking = y + 1;
+        do
+        {
+            if (b->board_[x][checking] == SHIP) return false;
+            checking += 1;
+        } while ((checking < b->size_) && (b->board_[x][checking] == HIT_SHIP));
+    }
+    if (x > 0) {
+        checking = x - 1;
+        do
+        {
+            if (b->board_[checking][y] == SHIP) return false;
+            checking -= 1;
+        } while ((checking >= 0) && (b->board_[checking][y] == HIT_SHIP));
+    }
+    if (x < b->size_ - 1)
+    {
+        checking = x + 1;
+        do
+        {
+            if (b->board_[checking][y] == SHIP) return false;
+            checking += 1;
+        } while ((checking < b->size_) && (b->board_[checking][y] == HIT_SHIP));
+    }
+    return true;
+}
+
+// Output will probably be sent to server
+bool receive_shot(int x, int y, board* b)
+{
+    if (b->board_[x][y] == SHIP)
+    {
+        b->board_[x][y] = HIT_SHIP;
+        if (check_destroyed(x, y, b))
+        {
+            b->destroyed_++;
+            if (b->destroyed_ == 5)
+            {
+                // Probably gonna want to send the server an "im dead" message
+            }
+        }
+        return true;
+    }
+    b->board_[x][y] = HIT_WATER;
+    return false;    
+}
+
+void get_shot(char* shot, board* b_enemy)
+{
+    bool accepted = false;
+    while (!accepted)
+    {
+        int c;
+        while ((c = getchar() != '\n') && c != EOF);
+        if (fgets(shot, sizeof(char) * 2, stdin) == NULL) {
+            printf("An error occured, try again\n");
+            continue;
+        }
+        if (strrchr(shot, '\n'))
+        {
+            printf("Not enough characters determine shot, try again\n");
+            continue;
+        }
+        if (!validate_coords(shot))
+        {
+            printf("Input not valid, try again\n");
+            continue;
+        }
+        int x = shot[0] - 'A';
+        int y = shot[1] - '0';
+        if(b_enemy->board_[x][y] != NOT_HIT)
+        {
+            printf("You have already shot there, try again\n");
+        }
+    }
+    printf("Shot accepted!\n");
+}
+
+// The output of this is probably just gonna get sent to server
+char* shoot(board* b_enemy)
+{
+    printf("Shots are given as \"A2\"\n");
+    printf("X coordinate: A-J\n");
+    printf("Y coordinate: 0-9\n");
+    printf("Where do you want to shoot?\n");
+    char* shot[3];
+    get_shot(shot, b_enemy);
+    return shot;
+}
+// Adam, dont forget to save the last shot before you send it to server, youll need it for this
+void mark_hit(char* shot, bool destroyed, board* b_enemy)
+{
+    int x = shot[0] - 'A';
+    int y = shot[1] - '0';
+    if (destroyed)
+    {
+        b_enemy->board_[x][y] = HIT_SHIP;
+        return;
+    }
+    b_enemy->board_[x][y] = HIT_WATER;
 }
 
 int main() {
