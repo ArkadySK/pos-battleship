@@ -27,7 +27,7 @@ void board_destroy(board* b)
 
 void board_display(board* b_own, board* b_enemy)
 {
-    clear_screen();
+    //clear_screen();
     printf("       Your board      |      Enemy board\n");
     printf("   A B C D E F G H I J |   A B C D E F G H I J\n");
     for (int j = 0; j < b_own->size_; j++)
@@ -63,6 +63,15 @@ bool validate_rotation(char rotation)
     return((rotation == DOWN) || (rotation == RIGHT));
 }
 
+bool validate_tile(int x, int y, board* b)
+{
+    if ((x < 0 || x >= b->size_) || (y < 0 || y >= b->size_))
+    {
+        return true;
+    }
+    return (!(b->board_[x][y] == SHIP));
+}
+
 bool validate_position(char* position, int size, board* b)
 {
     int x = position[0] - 'A';
@@ -71,74 +80,23 @@ bool validate_position(char* position, int size, board* b)
     if (position[2] == 'r') down = false;
     if (down)
     {
-        // Check if ship is out of bounds
-        if (y + size >= b->size_) return false;
-
-        // Check if the tiles where the ship will be placed are occupied by another ship
-        for (int i = y; i < y + size; i++)
+        if (y + size > b->size_) return false;
+        for (int i = x - 1; i <= x + 1; i++)
         {
-            if (b->board_[x][i] == SHIP) return false;
-        }
-        // Check if there are taken tiles to the left of the ship, if any
-        if (x > 0)
-        {
-            for (int i = y; i < y + size; i++)
+            for(int j = y - 1; j <= y + size + 1; j++)
             {
-                if (b->board_[x - 1][i] == SHIP) return false;
+                if (!validate_tile(i, j, b)) return false;
             }
         }
-        // Check if there are taken tiles to the right of the ship, if any
-        if (x < b->size_ - 1)
-        {
-            for (int i = y; i < y + size; i++)
-            {
-                if (b->board_[x + 1][i] == SHIP) return false;
-            }
-        }
-        // Check if there are taken tiles above and diagonally above the ship, if any
-        if ((y > 0) && (b->board_[x][y - 1] == SHIP)
-            && (b->board_[x - 1][y - 1] == SHIP)
-            && (b->board_[x + 1][y - 1] == SHIP))
-            return false;
-        // Check if there are taken tiles above and diagonally below the ship, if any
-        if ((y + size < b->size_ - 1) && (b->board_[x][y + size] == SHIP)
-            && (b->board_[x - 1][y + size] == SHIP)
-            && (b->board_[x + 1][y + size] == SHIP))
-            return false;
     }
     else
     {
-        // Check if ship is out of bounds
-        if (x + size >= b->size_) return false;
-        // Check if the tiles where the ship will be placed are occupied by another ship
-        for (int i = x; i < x + size; i++)
+        if (x + size > b->size_) return false;
+        for(int i = x - 1; i <= x + size + 1; i++)
         {
-            if (b->board_[i][y] == SHIP) return false;
-        }
-        // Check if there are taken tiles right and diagonally right of the ship, if any
-        if ((x > 0) && (b->board_[x - 1][y] == SHIP)
-            && (b->board_[x - 1][y - 1] == SHIP)
-            && (b->board_[x - 1][y + 1] == SHIP))
-            return false;
-        // Check if there are taken tiles left and diagonally left of the ship, if any
-        if ((x + size < b->size_ - 1) && (b->board_[x + size][y] == SHIP)
-            && (b->board_[x + size][y - 1] == SHIP)
-            && (b->board_[x + size][y + 1] == SHIP))
-            return false;
-        // Check if there are taken tiles above the ship, if any
-        if (y > 0)
-        {
-            for (int i = x; i < x + size; i++)
+            for (int j = y - 1; j <= y + 1; j++)
             {
-                if (b->board_[i][y = 1] == SHIP) return false;
-            }
-        }
-        // Check if there are taken tiles below the ship, if any
-        if (y < b->size_ - 1)
-        {
-            for (int i = x; i < x + size; i++)
-            {
-                if (b->board_[i][y + 1] == SHIP) return false;
+                if (!validate_tile(i, j, b)) return false;
             }
         }
     }
@@ -209,6 +167,7 @@ void place_ships(board* b)
     printf("-------------------------------\n");
     printf("Press any key to continue...\n");
     getchar();
+    while (getchar() != '\n');
     board_display(b, b);
     char* position = calloc(4, sizeof(char));
     printf("Where do you want to place the 5 tile ship?\n");
@@ -231,7 +190,7 @@ void place_ships(board* b)
     get_ship(position, 2, b);
     finalise_placement(position, 2, b);
     board_display(b, b);
-    printf("All ships successfully placed");
+    printf("All ships successfully placed\n");
     free(position);
 }
 
@@ -349,10 +308,3 @@ void mark_hit(int x, int y, int hit, board* b_enemy)
     }
     b_enemy->board_[x][y] = HIT_WATER;
 }
-
-// int main() {
-//     //TODO Adam: testing purposes
-//     board b;
-//     board_init(&b, 10);
-//     place_ships(&b);
-// }
