@@ -9,10 +9,9 @@
 #include "../source/menu.h"
 #include "../source/utils.h"
 
-#define PORT 8536
 #define SERVER_IP "127.0.0.1" //localhost
 
-int initialize_client() {
+int initialize_client(int port) {
     int sock;
     struct sockaddr_in server_addr;
 
@@ -24,7 +23,7 @@ int initialize_client() {
 
     // Set server address
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(PORT);
+    server_addr.sin_port = htons(port);
 
     if (inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr) <= 0) {
         perror("IC: Invalid address or address not supported");
@@ -64,7 +63,7 @@ void play_game(int sock) {
     board_destroy(&b_enemy);
 }
 
-int main() {
+int main(int argc, char** argv) {
     int mode;
     
     // Handle menu
@@ -75,17 +74,21 @@ int main() {
     clear_screen();
     
     if (mode == 1) { // Computer game mode
-        show_message("Computer mode not yet implemented\n");
+        show_message("Computer mode not yet implemented");
         sleep(3);
         clear_screen();
         //TODO Waffle: implement
         return 0;
     }
     
+    int port = 8536;
+    if(argc >= 2)
+        port = atoi(argv[1]);
+
     if (mode == 2) { // Human vs Human (network) mode
-        show_message("Please wait, connecting...\n");
+        show_message("Please wait, connecting...");
         sleep(1);
-        int sock = initialize_client();
+        int sock = initialize_client(port);
         play_game(sock);
         close(sock);
     }

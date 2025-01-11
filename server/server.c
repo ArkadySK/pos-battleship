@@ -8,12 +8,11 @@
 #include <stdatomic.h>
 #include <stdbool.h>
 
-#define PORT 8536
 #define MAX_PLAYERS 2
 
 atomic_int player_count = 0; // Atomic variable to track connected players
 
-int initialize_server()
+int initialize_server(int port)
 {
     int server_fd;
     struct sockaddr_in address;
@@ -29,7 +28,7 @@ int initialize_server()
     // Set server address
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);
+    address.sin_port = htons(port);
 
     // Bind the socket to the address
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
@@ -71,11 +70,15 @@ void *handle_client(void *arg)
     return NULL;
 }
 
-int main()
+int main(int argc, char** argv)
 {
-    int server_fd = initialize_server();
+    int port = 8536;
+    if(argc >= 2)
+        port = atoi(argv[1]);
 
-    printf("Server is running on port %d\n", PORT);
+    int server_fd = initialize_server(port);
+
+    printf("Server is running on port %d\n", port);
 
     while (true)
     {
