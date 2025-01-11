@@ -308,26 +308,3 @@ void mark_hit(char* shot, bool destroyed, board* b_enemy)
     }
     b_enemy->board_[x][y] = HIT_WATER;
 }
-
-int main() {
-    //TODO Adam: testing purposes
-    board p1_own;
-    board p1_enemy;
-    board p2_own;
-    board p2_enemy;
-    board_init(&p1_own, 10);
-    board_init(&p1_enemy, 10);
-    board_init(&p2_own, 10);
-    board_init(&p2_enemy, 10);
-    place_ships(&p1_own);
-    place_ships(&p2_own);
-    while(true)
-    {
-        char* shot;
-        int x = shot[0] - 'A';
-        int y = shot[1] - '0';
-        shot = shoot(&p1_enemy);
-        bool hit = receive_shot(x, y, &p1_enemy);
-        mark_hit(shot, hit, &p1_enemy);
-    }
-}
