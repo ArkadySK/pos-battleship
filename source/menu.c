@@ -45,6 +45,6 @@ int handle_menu(void) {
 void show_message(char* message) {
     clear_screen();
     printf("  -------------------------------  \n  ");
-    printf(message);
-    printf("  -------------------------------  \n");
+    printf("%s", message);
+    printf("\n  -------------------------------  \n");
 }
