@@ -105,7 +105,7 @@ void *handle_client(void *arg)
     
     // Wait for opponent
     while(!players[player_slot].has_opponent) {
-        Message msg ={.type = MSG_WAIT_PLAYER};
+        Message msg = {.type = MSG_WAIT_PLAYER};
         send(client_socket, &msg, sizeof(Message), 0);
         sleep(1);
         
@@ -121,10 +121,16 @@ void *handle_client(void *arg)
     Message start_msg = {.type = MSG_START_GAME};
     send(client_socket, &start_msg, sizeof(Message), 0);
     
-    // First player gets first turn
+    // Wait a moment to ensure both players have received START_GAME
+    usleep(100000);  // 100ms
+    
+    // First player gets first turn, but only after both are ready
     if(player_slot == 0) {
         Message turn_msg = {.type = MSG_YOUR_TURN};
         send(client_socket, &turn_msg, sizeof(Message), 0);
+    } else {
+        Message wait_msg = {.type = MSG_WAIT_PLAYER};
+        send(client_socket, &wait_msg, sizeof(Message), 0);
     }
 
     // Game loop
@@ -140,16 +146,19 @@ void *handle_client(void *arg)
 
         switch(msg.type) {
             case MSG_SHOT:
+                Message wait_msg = {.type = MSG_WAIT_PLAYER};
+                send(client_socket, &wait_msg, sizeof(Message), 0);
+
                 // Forward shot to opponent
                 send(opponent_socket, &msg, sizeof(Message), 0);
                 break;
                 
             case MSG_RESULT:
-                // Forward result to opponent
+                // Forward result to shooter
                 send(opponent_socket, &msg, sizeof(Message), 0);
-                // Send turn message to opponent
+                // Send turn message to the player who just got shot at
                 Message turn_msg = {.type = MSG_YOUR_TURN};
-                send(opponent_socket, &turn_msg, sizeof(Message), 0);
+                send(client_socket, &turn_msg, sizeof(Message), 0);
                 break;
         }
     }

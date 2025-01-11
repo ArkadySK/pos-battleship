@@ -297,12 +297,11 @@ int receive_shot(int x, int y, board* b)
 
 void get_shot(char* shot, board* b_enemy)
 {
-    bool accepted = false;
-    while (!accepted)
+    while (true)
     {
-        int c;
-        while ((c = getchar() != '\n') && c != EOF);
-        if (fgets(shot, sizeof(char) * 2, stdin) == NULL) {
+        char* result = fgets(shot, sizeof(char) * 3, stdin);
+        while (getchar() != '\n');
+        if (result == NULL) {
             printf("An error occured, try again\n");
             continue;
         }
@@ -321,7 +320,9 @@ void get_shot(char* shot, board* b_enemy)
         if(b_enemy->board_[x][y] != NOT_HIT)
         {
             printf("You have already shot there, try again\n");
+            continue;
         }
+        break;
     }
     printf("Shot accepted!\n");
 }

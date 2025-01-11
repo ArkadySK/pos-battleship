@@ -77,7 +77,6 @@ void play_game(int sock)
             case MSG_START_GAME:
                 clear_screen();
                 show_message("Game started!");
-                my_turn = true;  // First player starts
                 break;
 
             case MSG_YOUR_TURN:
@@ -99,9 +98,8 @@ void play_game(int sock)
                 break;
 
             case MSG_RESULT:
-                //Result of our shot
-                mark_hit(msg.x,msg.y, msg.hit, &b_enemy);
-                my_turn = true;  //our turn again
+                // Result of our shot
+                mark_hit(msg.x, msg.y, msg.hit, &b_enemy);
                 break;
 
             case MSG_GAME_OVER:
@@ -115,6 +113,7 @@ void play_game(int sock)
             // TODO refactor?
             int x = shot[0] - 'A';
             int y = shot[1] - '0';
+            free(shot);  // Add this to prevent memory leak
 
             // Send shot
             Message msg = {
