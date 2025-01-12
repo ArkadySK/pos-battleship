@@ -53,6 +53,16 @@ void board_display(board* b_own, board* b_enemy)
     }
 }
 
+void parse_input(char* input, int* x, int* y, bool* down)
+{
+    *x = input[0] - 'A';
+    *y = input[1] - '0';
+    if (down != NULL)
+    {
+        *down = input[2] == DOWN;
+    }
+}
+
 bool validate_coords(char* coords)
 {
     return((coords[0] >= 'A') && (coords[0] <= 'J') && (coords[1] >= '0') && (coords[1] <= '9'));
@@ -74,10 +84,10 @@ bool validate_tile(int x, int y, board* b)
 
 bool validate_position(char* position, int size, board* b)
 {
-    int x = position[0] - 'A';
-    int y = position[1] - '0';
-    bool down = true;
-    if (position[2] == 'r') down = false;
+    int x;
+    int y;
+    bool down;
+    parse_input(position, &x, &y, &down);
     if (down)
     {
         if (y + size > b->size_) return false;
@@ -136,10 +146,10 @@ void get_ship(char* position, int size, board* b)
 
 void finalise_placement(char* position, int size, board* b)
 {
-    int x = position[0] - 'A';
-    int y = position[1] - '0';
-    bool down = true;
-    if (position[2] == 'r') down = false;
+    int x;
+    int y;
+    bool down;
+    parse_input(position, &x, &y, &down);
     if (down)
     {
         for (int i = y; i < y + size ; i++)
@@ -273,8 +283,9 @@ void get_shot(char* shot, board* b_enemy)
             printf("Input not valid, try again\n");
             continue;
         }
-        int x = shot[0] - 'A';
-        int y = shot[1] - '0';
+        int x;
+        int y;
+        parse_input(shot, &x, &y, NULL);
         if(b_enemy->board_[x][y] != NOT_HIT)
         {
             printf("You have already shot there, try again\n");

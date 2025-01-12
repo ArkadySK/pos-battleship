@@ -45,6 +45,8 @@ int initialize_client(int port)
     return sock;
 }
 
+void play_game_
+
 void play_game(int sock)
 {
     board b_own;
