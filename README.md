@@ -6,7 +6,7 @@ This is an implementation of the game BattleShip for the class Princípy Operač
 
 The game board is displayed in the following way for each player:
 ```
-   A B C D E F G G I J
+   A B C D E F G H I J
  0 o o o o o o o o o o
  1 X o o o o o o o o o
  2 # . . . . . . . . .
