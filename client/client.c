@@ -85,6 +85,14 @@ void play_game(int sock)
             case MSG_SHOT:
                 // Received shot from opponent
                 int hit =receive_shot(msg.x, msg.y, &b_own);
+
+                if (hit == -1) {
+                    printf("You lost!\n");
+                    Message game_over_msg = {.type = MSG_GAME_OVER};
+                    send(sock, &game_over_msg, sizeof(Message), 0);
+                    game_over = true;
+                    break;
+                }
                 
                 // Send result back
                 Message result = {
@@ -102,6 +110,7 @@ void play_game(int sock)
                 break;
 
             case MSG_GAME_OVER:
+                printf("You win!\n");
                 game_over = true;
                 break;
         }
