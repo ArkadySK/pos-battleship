@@ -166,7 +166,6 @@ void place_ships(board* b)
     printf("Ships cannot be adjacent to other ships\n");
     printf("-------------------------------\n");
     printf("Press any key to continue...\n");
-    getchar();
     while (getchar() != '\n');
     board_display(b, b);
     char* position = calloc(4, sizeof(char));
