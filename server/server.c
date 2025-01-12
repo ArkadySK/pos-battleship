@@ -1,23 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <string.h>
-#include <pthread.h>
-#include <stdatomic.h>
-#include <stdbool.h>
-#include "../source/message.h"
-
-#define MAX_PLAYERS 2
+#include "server.h"
 
 atomic_int player_count = 0; // Atomic variable to track connected players
-
-typedef struct {
-    int socket;
-    int opponent_socket;
-    bool has_opponent;
-} Player;
 
 Player players[MAX_PLAYERS];
 pthread_mutex_t players_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -79,7 +62,13 @@ void *handle_client(void *arg)
     //Dereference the pointer to get the socket
     int client_socket = *(int *)arg;
     
-    // Register player
+    // Receive game mode from client
+    Message mode_msg;
+    if (recv(client_socket, &mode_msg, sizeof(Message), 0) <= 0) {
+        close(client_socket);
+        return NULL;
+    }
+
     pthread_mutex_lock(&players_mutex);
     int player_slot = find_empty_slot();
     if(player_slot == -1) {
@@ -90,19 +79,39 @@ void *handle_client(void *arg)
     
     players[player_slot].socket = client_socket;
     players[player_slot].has_opponent = false;
-    
-    //Try to find opponent, assign opponent socket and set has_opponent to true
-    for(int i = 0; i < MAX_PLAYERS; i++) {
-        if(i != player_slot && players[i].socket != 0 && !players[i].has_opponent) {
-            players[player_slot].opponent_socket = players[i].socket;
+    players[player_slot].player_type = PLAYER_TYPE_HUMAN;
+
+    if (mode_msg.type == MSG_SINGLE_PLAYER) {
+        // Create bot player
+        int bot_slot = find_empty_slot();
+        if(bot_slot != -1) {
+            players[bot_slot].socket = -1;
+            players[bot_slot].player_type = PLAYER_TYPE_BOT;
+            players[bot_slot].bot_state = malloc(sizeof(BotState));
+            board_init(&players[bot_slot].bot_state->b_own, 10);
+            board_init(&players[bot_slot].bot_state->b_enemy, 10);
+            generate_board(&players[bot_slot].bot_state->b_own);
+            
+            // Connect bot and human player
+            players[player_slot].opponent_socket = -1;
             players[player_slot].has_opponent = true;
-            players[i].opponent_socket = client_socket;
-            players[i].has_opponent = true;
-            break;
+            players[bot_slot].opponent_socket = client_socket;
+            players[bot_slot].has_opponent = true;
+        }
+    } else if (mode_msg.type == MSG_MULTI_PLAYER) {
+        //Try to find opponent, assign opponent socket and set has_opponent to true
+        for(int i = 0; i < MAX_PLAYERS; i++) {
+            if(i != player_slot && players[i].socket != 0 && !players[i].has_opponent) {
+                players[player_slot].opponent_socket = players[i].socket;
+                players[player_slot].has_opponent = true;
+                players[i].opponent_socket = client_socket;
+                players[i].has_opponent = true;
+                break;
+            }
         }
     }
     pthread_mutex_unlock(&players_mutex);
-    
+
     // Wait for opponent
     while(!players[player_slot].has_opponent) {
         Message msg = {.type = MSG_WAIT_PLAYER};
@@ -121,10 +130,10 @@ void *handle_client(void *arg)
     Message start_msg = {.type = MSG_START_GAME};
     send(client_socket, &start_msg, sizeof(Message), 0);
     
-    // Wait a moment to ensure both players have received START_GAME
+    // Wait to ensure both players have received START_GAME
     usleep(100000);  // 100ms
     
-    // First player gets first turn, but only after both are ready
+    // First player gets first turn after both are ready
     if(player_slot == 0) {
         Message turn_msg = {.type = MSG_YOUR_TURN};
         send(client_socket, &turn_msg, sizeof(Message), 0);
@@ -146,23 +155,72 @@ void *handle_client(void *arg)
 
         switch(msg.type) {
             case MSG_SHOT:
-                Message wait_msg = {.type = MSG_WAIT_PLAYER};
-                send(client_socket, &wait_msg, sizeof(Message), 0);
+                if (players[find_player_slot(opponent_socket)].player_type == PLAYER_TYPE_BOT)
+                {
+                    // Handle bot response
+                    int bot_slot = find_player_slot(opponent_socket);
+                    BotState* bot_state = players[bot_slot].bot_state;
+                    
+                    // Process player's shot
+                    int hit = receive_shot(msg.x, msg.y, &bot_state->b_own);
+                    
+                    // Send result back to player
+                    Message result = {
+                        .type = MSG_RESULT,
+                        .x = msg.x,
+                        .y = msg.y,
+                        .hit = hit
+                    };
+                    send(client_socket, &result, sizeof(Message), 0);
 
-                // Forward shot to opponent
-                send(opponent_socket, &msg, sizeof(Message), 0);
+                    if (hit == -1)
+                    {
+                        Message game_over = {.type = MSG_GAME_OVER};
+                        send(client_socket, &game_over, sizeof(Message), 0);
+                        break;
+                    }
+                    char shot[3];
+                    generate_shot(shot, &bot_state->b_enemy);
+                    int x = shot[0] - 'A';
+                    int y = shot[1] - '0';
+                    
+                    Message bot_shot = {
+                        .type = MSG_SHOT,
+                        .x = x,
+                        .y = y
+                    };
+                    send(client_socket, &bot_shot, sizeof(Message), 0);
+                } 
+                else 
+                {
+                    Message wait_msg = {.type = MSG_WAIT_PLAYER};
+                    send(client_socket, &wait_msg, sizeof(Message), 0);
+                    send(opponent_socket, &msg, sizeof(Message), 0);
+                }
                 break;
                 
             case MSG_RESULT:
                 // Forward result to shooter
-                send(opponent_socket, &msg, sizeof(Message), 0);
+                if (players[find_player_slot(opponent_socket)].player_type == PLAYER_TYPE_BOT)
+                {
+                    int bot_slot = find_player_slot(opponent_socket);
+                    BotState* bot_state = players[bot_slot].bot_state;
+                    mark_hit(msg.x, msg.y, msg.hit, &bot_state->b_enemy);
+                }
+                else
+                {
+                    send(opponent_socket, &msg, sizeof(Message), 0);
+                }
                 // Send turn message to the player who just got shot at
                 Message turn_msg = {.type = MSG_YOUR_TURN};
                 send(client_socket, &turn_msg, sizeof(Message), 0);
                 break;
             
             case MSG_GAME_OVER:
-                send(opponent_socket, &msg, sizeof(Message), 0);
+                if (players[find_player_slot(opponent_socket)].player_type != PLAYER_TYPE_BOT)
+                {
+                    send(opponent_socket, &msg, sizeof(Message), 0);
+                }
                 break;
         }
     }
@@ -185,6 +243,12 @@ void *handle_client(void *arg)
     // destroy opponent's data
     for(int i = 0; i < MAX_PLAYERS; i++) {
         if(players[i].socket == opponent_socket) {
+            if (players[i].player_type == PLAYER_TYPE_BOT && players[i].bot_state != NULL) {
+                board_destroy(&players[i].bot_state->b_own);
+                board_destroy(&players[i].bot_state->b_enemy);
+                free(players[i].bot_state);
+                players[i].bot_state = NULL;
+            }
             players[i].opponent_socket = 0;
             players[i].has_opponent = false;
             break;

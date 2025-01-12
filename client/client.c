@@ -1,16 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <string.h>
-#include "../source/board.h"
-#include "../source/menu.h"
-#include "../source/utils.h"
-#include "../source/message.h"
-
-#define SERVER_IP "127.0.0.1" // localhost
+#include "client.h"
 
 int initialize_client(int port)
 {
@@ -45,8 +33,6 @@ int initialize_client(int port)
     return sock;
 }
 
-void play_game_
-
 void play_game(int sock)
 {
     board b_own;
@@ -58,8 +44,6 @@ void play_game(int sock)
     // Initialize game boards
     board_init(&b_own, 10);
     board_init(&b_enemy, 10);
-
-    // Place ships
     place_ships(&b_own);
 
     // Game loop
@@ -120,11 +104,12 @@ void play_game(int sock)
 
         if (my_turn) {
             board_display(&b_own, &b_enemy);
-            char* shot = shoot(&b_enemy);
-            // TODO refactor?
-            int x = shot[0] - 'A';
-            int y = shot[1] - '0';
-            free(shot);  // Add this to prevent memory leak
+            char* shot = calloc(3, sizeof(char));
+            shoot(shot, &b_enemy);
+            int x;
+            int y;
+            parse_input(shot, &x, &y, NULL);
+            free(shot);
 
             // Send shot
             Message msg = {
@@ -145,6 +130,9 @@ void play_game(int sock)
 int main(int argc, char **argv)
 {
     int mode;
+    int port = 8536;
+    if (argc >= 2)
+        port = atoi(argv[1]);
 
     // Handle menu
     mode = handle_menu();
@@ -153,24 +141,29 @@ int main(int argc, char **argv)
 
     clear_screen();
 
-    if (mode == 1) // Computer game mode
+    if (mode == 1) // Computer singleplayer game mode
     { 
-        show_message("Computer mode not yet implemented");
-        sleep(3);
-        clear_screen();
-        // TODO Waffle: implement
+        show_message("Connecting to computer opponent...");
+        sleep(1);
+        int sock = initialize_client(port);
+        
+        Message mode_msg = {.type = MSG_SINGLE_PLAYER};
+        send(sock, &mode_msg, sizeof(Message), 0);
+        
+        play_game(sock);
+        close(sock);
         return 0;
     }
 
-    int port = 8536;
-    if (argc >= 2)
-        port = atoi(argv[1]);
-
-    if (mode == 2) // Human vs Human (network) mode
+    if (mode == 2) // Human vs Human multiplayer mode
     { 
         show_message("Please wait, connecting...");
         sleep(1);
         int sock = initialize_client(port);
+        
+        Message mode_msg = {.type = MSG_MULTI_PLAYER};
+        send(sock, &mode_msg, sizeof(Message), 0);
+        
         play_game(sock);
         close(sock);
     }
