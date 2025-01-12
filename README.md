@@ -31,19 +31,41 @@ X - Hit BattleShip
 
 ### How to run the code? 
 
-1. Create a build folder
+#### 1. Create a build folder
 ```
 mkdir build
 cd build
 cmake ..
 ```
 
-2. Launch a build process
+
+#### 2. Launch a build process
 ```
 cmake --build .
 ```
 
-3. Start the program 
+
+
+#### 3. Build options for Cmake:
+- clean bin folder
+```
+cmake --build . --target clean
+```
+- build all (both server and client)
+```
+cmake --build . --target all
+```
+- build server
+```
+cmake --build . --target server
+```
+- build client
+```
+cmake --build . --target client
+```
+
+
+#### 4. Start the program 
 - client:
 ```
 ./bin/client
