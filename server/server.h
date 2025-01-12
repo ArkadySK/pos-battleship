@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include "../source/message.h"
 #include "bot_board.h"
+#include "../source/utils.h"
 
 #define MAX_PLAYERS 2
 #define PLAYER_TYPE_HUMAN 0

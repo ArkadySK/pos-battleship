@@ -181,9 +181,9 @@ void *handle_client(void *arg)
                     }
                     char shot[3];
                     generate_shot(shot, &bot_state->b_enemy);
-                    int x = shot[0] - 'A';
-                    int y = shot[1] - '0';
-                    
+                    int x;
+                    int y;
+                    parse_input(shot, &x, &y, NULL);
                     Message bot_shot = {
                         .type = MSG_SHOT,
                         .x = x,
@@ -266,7 +266,7 @@ int main(int argc, char** argv)
     // Initialize players array with 0s
     memset(players, 0, sizeof(players));
     
-    int port = 8536;
+    int port = DEFAULT_PORT;
     if(argc >= 2)
         port = atoi(argv[1]);
 

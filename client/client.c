@@ -130,7 +130,7 @@ void play_game(int sock)
 int main(int argc, char **argv)
 {
     int mode;
-    int port = 8536;
+    int port = DEFAULT_PORT;
     if (argc >= 2)
         port = atoi(argv[1]);
 
