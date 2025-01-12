@@ -9,7 +9,6 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Libs
-#add_library(game_logic STATIC source/game_logic.c)
 add_library(utils STATIC source/utils.c)
 add_library(menu STATIC source/menu.c)
 add_library(board STATIC source/board.c)
