@@ -75,7 +75,6 @@ void play_game(int sock)
                 break;
 
             case MSG_START_GAME:
-                clear_screen();
                 show_message("Game started!");
                 break;
 
