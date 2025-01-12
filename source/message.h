@@ -4,6 +4,8 @@
 #define MSG_SHOT 'H'           // Shot coordinates
 #define MSG_RESULT 'R'         // Shot result
 #define MSG_GAME_OVER 'G'      // Game over
+#define MSG_SINGLE_PLAYER 'B'  // Single player mode
+#define MSG_MULTI_PLAYER 'M'   // Multi player mode
 
 typedef struct {
     char type;          // Message type

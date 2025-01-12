@@ -53,6 +53,16 @@ void board_display(board* b_own, board* b_enemy)
     }
 }
 
+void parse_input(char* input, int* x, int* y, bool* down)
+{
+    *x = input[0] - 'A';
+    *y = input[1] - '0';
+    if (down != NULL)
+    {
+        *down = input[2] == DOWN;
+    }
+}
+
 bool validate_coords(char* coords)
 {
     return((coords[0] >= 'A') && (coords[0] <= 'J') && (coords[1] >= '0') && (coords[1] <= '9'));
@@ -74,10 +84,10 @@ bool validate_tile(int x, int y, board* b)
 
 bool validate_position(char* position, int size, board* b)
 {
-    int x = position[0] - 'A';
-    int y = position[1] - '0';
-    bool down = true;
-    if (position[2] == 'r') down = false;
+    int x;
+    int y;
+    bool down;
+    parse_input(position, &x, &y, &down);
     if (down)
     {
         if (y + size > b->size_) return false;
@@ -136,10 +146,10 @@ void get_ship(char* position, int size, board* b)
 
 void finalise_placement(char* position, int size, board* b)
 {
-    int x = position[0] - 'A';
-    int y = position[1] - '0';
-    bool down = true;
-    if (position[2] == 'r') down = false;
+    int x;
+    int y;
+    bool down;
+    parse_input(position, &x, &y, &down);
     if (down)
     {
         for (int i = y; i < y + size ; i++)
@@ -197,43 +207,42 @@ bool check_destroyed(int x, int y, board* b)
 {
     int checking;
     if (y > 0) {
-        checking = y - 1;
-        do
+        checking = y;
+        while ((checking >= 0) && (b->board_[x][checking] == HIT_SHIP))
         {
-            if (b->board_[x][checking] == SHIP) return false;
-            checking -= 1;
-        } while ((checking >= 0) && (b->board_[x][checking] == HIT_SHIP));
+            if (b->board_[checking][y] == SHIP) return false;
+            checking--;
+        }
     }
     if (y < b->size_ - 1)
     {
-        checking = y + 1;
-        do
-        {
-            if (b->board_[x][checking] == SHIP) return false;
-            checking += 1;
-        } while ((checking < b->size_) && (b->board_[x][checking] == HIT_SHIP));
-    }
-    if (x > 0) {
-        checking = x - 1;
-        do
+        checking = y;
+        while ((checking < b->size_) && (b->board_[x][checking] == HIT_SHIP))
         {
             if (b->board_[checking][y] == SHIP) return false;
-            checking -= 1;
-        } while ((checking >= 0) && (b->board_[checking][y] == HIT_SHIP));
+            checking++;
+        }
+    }
+    if (x > 0) {
+        checking = x;
+        while ((checking >= 0) && (b->board_[checking][y] == HIT_SHIP))
+        {
+            if (b->board_[checking][y] == SHIP) return false;
+            checking--;
+        }
     }
     if (x < b->size_ - 1)
     {
-        checking = x + 1;
-        do
+        checking = x;
+        while ((checking < b->size_) && (b->board_[checking][y] == HIT_SHIP))
         {
             if (b->board_[checking][y] == SHIP) return false;
-            checking += 1;
-        } while ((checking < b->size_) && (b->board_[checking][y] == HIT_SHIP));
+            checking++;
+        }
     }
     return true;
 }
 
-// Output will probably be sent to server
 int receive_shot(int x, int y, board* b)
 {
     if (b->board_[x][y] == SHIP)
@@ -273,8 +282,9 @@ void get_shot(char* shot, board* b_enemy)
             printf("Input not valid, try again\n");
             continue;
         }
-        int x = shot[0] - 'A';
-        int y = shot[1] - '0';
+        int x;
+        int y;
+        parse_input(shot, &x, &y, NULL);
         if(b_enemy->board_[x][y] != NOT_HIT)
         {
             printf("You have already shot there, try again\n");
@@ -285,19 +295,15 @@ void get_shot(char* shot, board* b_enemy)
     printf("Shot accepted!\n");
 }
 
-// The output of this is probably just gonna get sent to server
-char* shoot(board* b_enemy)
+void shoot(char* shot, board* b_enemy)
 {
     printf("Shots are given as \"A2\"\n");
     printf("X coordinate: A-J\n");
     printf("Y coordinate: 0-9\n");
     printf("Where do you want to shoot?\n");
-    char* shot = calloc(3, sizeof(char));
     get_shot(shot, b_enemy);
-    return shot;
 }
 
-// Adam, dont forget to save the last shot before you send it to server, you'll need it for this
 void mark_hit(int x, int y, int hit, board* b_enemy)
 {
     if (hit == 1)

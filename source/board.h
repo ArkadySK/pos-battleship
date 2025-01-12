@@ -25,6 +25,8 @@ void board_destroy(board* b);
 
 void board_display(board* b_own, board* b_enemy);
 
+void parse_input(char* input, int* x, int* y, bool* down);
+
 bool validate_coords(char* coords);
 
 bool validate_rotation(char rotation);
@@ -43,6 +45,6 @@ int receive_shot(int x, int y, board* b);
 
 void get_shot(char* shot, board* b_enemy);
 
-char* shoot(board* b_enemy);
+void shoot(char* shot, board* b_enemy);
 
 void mark_hit(int x, int y, int hit, board* b_enemy);
