@@ -27,7 +27,7 @@ void board_destroy(board* b)
 
 void board_display(board* b_own, board* b_enemy)
 {
-    //clear_screen();
+    clear_screen();
     printf("       Your board      |      Enemy board\n");
     printf("   A B C D E F G H I J |   A B C D E F G H I J\n");
     for (int j = 0; j < b_own->size_; j++)

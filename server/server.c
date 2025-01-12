@@ -160,6 +160,10 @@ void *handle_client(void *arg)
                 Message turn_msg = {.type = MSG_YOUR_TURN};
                 send(client_socket, &turn_msg, sizeof(Message), 0);
                 break;
+            
+            case MSG_GAME_OVER:
+                send(opponent_socket, &msg, sizeof(Message), 0);
+                break;
         }
     }
 
