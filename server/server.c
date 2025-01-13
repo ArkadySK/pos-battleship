@@ -228,7 +228,6 @@ void *handle_client(void *arg)
     pthread_mutex_lock(&players_mutex);
     int opponent_socket = players[player_slot].opponent_socket;
     
-    // TODO Adam: check if player receives game over message
     // Send game over to opponent if they're still connected
     if(players[player_slot].has_opponent) {
         Message game_over = {.type = MSG_GAME_OVER};

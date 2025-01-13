@@ -16,7 +16,7 @@ int initialize_client(int port)
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(port);
 
-    //TODO Adam: do we need this?
+    // Convert server ip to binary
     if (inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr) <= 0)
     {
         perror("IC: Invalid address or address not supported");
